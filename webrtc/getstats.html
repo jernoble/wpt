@@ -12,6 +12,7 @@ This test uses data only, and thus does not require fake media devices.
   <div id="log"></div>
   <h2>Retrieved stats info</h2>
   <pre>
+  <input type="button" onclick="showStats()" value="Show stats"></input>
   <div id="stats">
   </div>
   </pre>
@@ -21,21 +22,16 @@ This test uses data only, and thus does not require fake media devices.
   <script src="/resources/testharnessreport.js"></script>
   <script type="text/javascript">
   var test = async_test('Can get stats from a basic WebRTC call.');
-
+  var statsToShow;
   var gFirstConnection = null;
   var gSecondConnection = null;
 
   var onIceCandidateToFirst = test.step_func(function(event) {
-    // If event.candidate is null = no more candidates.
-    if (event.candidate) {
-      gSecondConnection.addIceCandidate(event.candidate);
-    }
+    gSecondConnection.addIceCandidate(event.candidate);
   });
 
   var onIceCandidateToSecond = test.step_func(function(event) {
-    if (event.candidate) {
-      gFirstConnection.addIceCandidate(event.candidate);
-    }
+    gFirstConnection.addIceCandidate(event.candidate);
   });
 
   var getStatsRecordByType = function(stats, type) {
@@ -56,13 +52,11 @@ This test uses data only, and thus does not require fake media devices.
     }
     gFirstConnection.getStats()
     .then(function(report) {
-      // Show the retrieved stats info
-      var showStats = document.getElementById('stats');
       let reportDictionary = {};
       for (let stats of report.values()) {
         reportDictionary[stats.id] = stats;
       }
-      showStats.innerHTML = JSON.stringify(reportDictionary, null, 2);
+      statsToShow = JSON.stringify(reportDictionary, null, 2);
       // Check the stats properties.
       assert_not_equals(report, null, 'No report');
       let sessionStat = getStatsRecordByType(report, 'peer-connection');
@@ -82,10 +76,12 @@ This test uses data only, and thus does not require fake media devices.
   // This function starts the test.
   test.step(function() {
     gFirstConnection = new RTCPeerConnection(null);
+    test.add_cleanup(() => gFirstConnection.close());
     gFirstConnection.onicecandidate = onIceCandidateToFirst;
     gFirstConnection.oniceconnectionstatechange = onIceConnectionStateChange;
 
     gSecondConnection = new RTCPeerConnection(null);
+    test.add_cleanup(() => gSecondConnection.close());
     gSecondConnection.onicecandidate = onIceCandidateToSecond;
 
     // The createDataChannel is necessary and sufficient to make
@@ -121,6 +117,13 @@ This test uses data only, and thus does not require fake media devices.
                        ' happened at step ' + atStep);
     }));
   });
+
+  function showStats() {
+    // Show the retrieved stats info
+    var showStats = document.getElementById('stats');
+    showStats.innerHTML = statsToShow;
+  }
+
 </script>
 
 </body>

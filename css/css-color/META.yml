@@ -1,6 +1,7 @@
 spec: https://drafts.csswg.org/css-color/
 suggested_reviewers:
   - dbaron
-  - tantek
   - svgeesus
   - tabatkins
+  - weinig
+

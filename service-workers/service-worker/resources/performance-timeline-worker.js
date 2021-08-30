@@ -30,12 +30,12 @@ promise_test(function(test) {
   }, 'User Timing');
 
 promise_test(function(test) {
-    return fetch('dummy.txt')
+    return fetch('sample.txt')
       .then(function(resp) {
           return resp.text();
         })
       .then(function(text) {
-          var expectedResources = ['testharness.js', 'dummy.txt'];
+          var expectedResources = ['testharness.js', 'sample.txt'];
           assert_equals(performance.getEntriesByType('resource').length, expectedResources.length);
           for (var i = 0; i < expectedResources.length; i++) {
               var entry = performance.getEntriesByType('resource')[i];
@@ -44,19 +44,13 @@ promise_test(function(test) {
               assert_greater_than(entry.startTime, 0);
               assert_greater_than(entry.responseEnd, entry.startTime);
           }
-          return Promise.race([
-            new Promise(function(resolve) {
+          return new Promise(function(resolve) {
               performance.onresourcetimingbufferfull = _ => {
                 resolve('bufferfull');
               }
               performance.setResourceTimingBufferSize(expectedResources.length);
-            }),
-
-            // Race the bufferfull event against another fetch.  We should get the
-            // event before this completes.  This allows us to detect a failure
-            // to dispatch the event without timing out the entire test.
-            fetch('dummy.txt').then(resp => resp.text())
-          ]);
+              fetch('sample.txt');
+          });
         })
       .then(function(result) {
           assert_equals(result, 'bufferfull');

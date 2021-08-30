@@ -10,6 +10,7 @@
         <link rel="help" href="http://www.w3.org/TR/css3-values/#calc-notation">
         <meta name="assert" content="An ellipse's <position> arguments may be in calc() values.">
         <meta name="flags" content="ahem dom">
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
         <script src="/resources/testharness.js"></script>
         <script src="/resources/testharnessreport.js"></script>
         <script src="support/parsing-utils.js"></script>
@@ -28,19 +29,6 @@
                                  ]);
                 } else {
                     testCase.push('ellipse(at '+ value[2] +' 50%)');
-                }
-                ellipse_position_calc_tests.push(testCase);
-            });
-            ParsingUtils.calcTestValues.forEach(function(value) {
-                testCase = ['ellipse(farthest-side at '+ value[0] +' 50%)',
-                            'ellipse(farthest-side at '+ value[1] +' 50%)'];
-                if(Object.prototype.toString.call( value[2] ) === '[object Array]' && value[2].length == 2) {
-                    testCase.push([
-                                    'ellipse(farthest-side at '+ value[2][0] +' 50%)',
-                                    'ellipse(farthest-side at '+ value[2][1] +' 50%)'
-                                  ]);
-                } else {
-                    testCase.push('ellipse(farthest-side at '+ value[2] +' 50%)');
                 }
                 ellipse_position_calc_tests.push(testCase);
             });
